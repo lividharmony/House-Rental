@@ -3,10 +3,11 @@ import os
 
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
 from database import create_db_pool
 from config import ADMINS
-from handlers.keyboards import inline_kb, admin_kb
+from handlers.keyboards import inline_kb, admin_kb, cancel_kb
 from handlers.states import HousingForm
 
 router = Router()
@@ -16,10 +17,19 @@ def filter_by_id(message: types.Message):
     return message.from_user.id in ADMINS
 
 
-@router.message(F.data == "Housing", F.from_user.id.in_(ADMINS))
+@router.message(F.text == "Bekor qilish")
+async def cancel_handler(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer(
+        "Bekor qilindi",
+        reply_markup=await admin_kb(message.from_user.id),
+    )
+
+
+@router.message(F.text == "Housing")
 async def start_admin_housing(message: types.Message, state: FSMContext):
     logging.info("Admin housing command received.")
-    await message.answer("Uy-joy haqida qisqacha ma'lumot kiriting:", reply_markup=admin_kb())
+    await message.answer("Uy-joy haqida qisqacha ma'lumot kiriting:", reply_markup=cancel_kb())
     await state.set_state(HousingForm.description)
 
 
@@ -56,7 +66,7 @@ async def add_image(message: types.Message, state: FSMContext):
     file_info = await message.bot.get_file(photo_f.file_id)
 
     await message.bot.download_file(file_info.file_path, file_path)
-    await state.update_data(photo=file_path)
+    await state.update_data(photo=file_path, photo_id=photo_f.file_id)
     logging.info("Updated state with photo: %s", file_path)
     await message.answer("Manzilni kiriting")
     await state.set_state(HousingForm.location)
@@ -84,22 +94,18 @@ async def add_duration(message: types.Message, state: FSMContext):
         photo = data["photo"]
         location = data["location"]
         duration = data["duration"]
+        photo_id = data["photo_id"]
 
-        pool = await create_db_pool()
-        async with pool.acquire() as connection:
-            await connection.execute(
-                "INSERT INTO housings (description, price, photo, location, duration, available)"
-                " VALUES ($1, $2, $3, $4, $5, TRUE)",
-                description, price, photo, location, duration
-            )
-
-        await message.answer(
-            f"Uy-joy muvaffaqiyatli qo'shildi!\n\n"
-            f"Description: {description}\nPrice:"
-            f" {price}\nLocation: {location}\nDuration: {duration} months\nImage path: {photo}",
+        await message.answer_photo(
+            photo=photo_id,
+            caption=f"Uy-joy muvaffaqiyatli qo'shildi!\n\n"
+                    f"Description: {description}\nPrice:"
+                    f" {price}\nLocation: {location}\nDuration: {duration} months\nImage path: {photo}",
             reply_markup=inline_kb()
         )
-        await state.clear()
     except ValueError:
         await message.answer("Iltimos, muddatni to'g'ri formatda kiriting (faqat son).")
+
+
+
 

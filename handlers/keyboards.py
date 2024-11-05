@@ -1,5 +1,7 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 
+from database import create_db_pool
+
 
 def menu_kb():
     kb = [
@@ -18,15 +20,32 @@ def menu_kb():
     return keyboard
 
 
-def admin_kb():
-    kb = [
-        [
-            KeyboardButton(text="Listings")
-        ],
-        [
-            KeyboardButton(text="Housing")
-        ],
-    ]
+async def admin_kb(user_id):
+    pool = await create_db_pool()
+    async with pool.acquire() as connection:
+        user_type = await connection.fetchval(
+            "SELECT user_type FROM users WHERE user_id = $1",
+            user_id
+        )
+
+    if user_type == 'owner':
+        kb = [
+            [
+                KeyboardButton(text="Listings")
+            ],
+            [
+                KeyboardButton(text="Housing")
+            ],
+        ]
+    else:
+        kb = [
+            [
+                KeyboardButton(text="Search")
+            ],
+            [
+                KeyboardButton(text="Application")
+            ],
+        ]
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=kb,
@@ -45,3 +64,18 @@ def inline_kb():
     ]
     )
     return kb
+
+
+def cancel_kb():
+    kb = [
+        [
+            KeyboardButton(text="Bekor qilish")
+        ]
+    ]
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+    )
+
+    return keyboard

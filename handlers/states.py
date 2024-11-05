@@ -15,5 +15,10 @@ class HousingForm(StatesGroup):
     description = State()
     price = State()
     photo = State()
+    photo_id = State()
     location = State()
     duration = State()
+
+
+class SearchState(StatesGroup):
+    search_query = State()

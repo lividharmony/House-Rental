@@ -1,35 +1,52 @@
-import types
-
-from aiogram import Router
+from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
+from handlers.keyboards import cancel_kb, admin_kb
 
 from database import create_db_pool
+from aiogram.types import Message
+from handlers.states import SearchState
+
 
 router = Router()
 
 
-@router.message(lambda message: message.text == "Listings")
-async def search_housings(message: types.Message, state: FSMContext):
-    await message.answer("Uy-joylarni qidirish uchun joylashuvni kiriting:")
-    await state.set_state("search_location")
+@router.message(F.text == "Bekor qilish")
+async def cancel_handler(message: Message, state: FSMContext) -> None:
+    await state.clear()
+
+    await message.answer(
+        "Bekor qilindi",
+        reply_markup=await admin_kb(message.from_user.id),
+    )
 
 
-@router.message(state="search_location")
-async def handle_location(message: types.Message, state: FSMContext):
-    location = message.text
+
+@router.message(F.text == "Search")
+async def start_search(message: Message, state: FSMContext):
+    await message.answer("Qidiruv:", reply_markup=cancel_kb())
+    await state.set_state(SearchState.search_query)
+
+
+@router.message(SearchState.search_query)
+async def handle_search_query(message: Message, state: FSMContext):
+    search_query = message.text
     pool = await create_db_pool()
 
     async with pool.acquire() as connection:
         housings = await connection.fetch(
-            "SELECT * FROM housings WHERE location = $1 AND available = TRUE", location
+            "SELECT description, price, location, duration FROM housings "
+            "WHERE location ILIKE $1 OR price::text ILIKE $1",
+            f"%{search_query}%"
         )
-
     if not housings:
-        await message.answer("Ushbu joylashuvda uy-joylar topilmadi.")
+        await message.answer("Hech narsa topilmadi.")
     else:
-        response = "Mavjud uy-joylar:\n"
         for housing in housings:
-            response += f"{housing['description']} - {housing['price']} USD\n"
-        await message.answer(response)
+            await message.answer(
+                f"Description: {housing['description']}\n"
+                f"Price: {housing['price']} UZS\n"
+                f"Location: {housing['location']}\n"
+                f"Duration: {housing['duration']} months"
+            )
 
     await state.clear()

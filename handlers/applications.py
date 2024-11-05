@@ -12,7 +12,8 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def apply_for_housing(message: types.Message, dispatcher: Dispatcher, state : FSMContext):
+async def apply_for_housing(message: types.Message, dispatcher: Dispatcher, state: FSMContext):
+    await state.clear()
     housing_id = 1
     user_id = message.from_user.id
     pool = dispatcher['db']
@@ -23,7 +24,6 @@ async def apply_for_housing(message: types.Message, dispatcher: Dispatcher, stat
             await start_registration(message, state)
             return
 
-    #
     # try:
     #     async with pool.acquire() as connection:
     #         await connection.execute(
@@ -39,8 +39,5 @@ async def apply_for_housing(message: types.Message, dispatcher: Dispatcher, stat
     # except Exception as e:
     #     await message.answer("Arizangizni jo'natishda xato yuz berdi.")
     #     print(f"Error inserting application: {e}")
-    await message.answer("Arizangiz qabul qilindi!", reply_markup=admin_kb())
-    await state.set_state(admin_kb())
-    await start_admin_housing(message, state)
 
-
+    await message.answer("Salom!", reply_markup=await admin_kb(message.from_user.id))

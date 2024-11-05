@@ -2,8 +2,9 @@ import logging
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from database import create_db_pool
+from handlers.keyboards import admin_kb
 
 
 router = Router()
@@ -32,7 +33,10 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
             " VALUES ($1, $2, $3, $4, $5, TRUE)",
             description, price, photo, location, duration
         )
-    await callback.message.edit_text("Uy-joy muvaffaqiyatli qo'shildi!")
+
+    await callback.message.delete()
+    await callback.message.answer("Uy-joy muvaffaqiyatli qo'shildi!",
+                                  reply_markup=await admin_kb(callback.from_user.id))
     await state.clear()
     await callback.answer()
 
@@ -40,5 +44,6 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "reject_housing")
 async def reject_housing(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("Ma'lumotlar bekor qilindi.")
+    await callback.message.edit_text("Ma'lumotlar bekor qilindi.", reply_markup=await admin_kb(callback.from_user.id))
     await callback.answer()
+
