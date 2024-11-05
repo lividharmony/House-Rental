@@ -1,41 +1,39 @@
-from aiogram import types, Bot, Router, Dispatcher
+from aiogram import types, Router, F, Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.filters import Command, CommandStart
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-# from handlers.common import start_registration
+from aiogram.filters import CommandStart
+
+from database import create_db_pool
+from handlers.keyboards import menu_kb
+from handlers.states import UserForm
+
 router = Router()
 
-choose_user_type = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Student"), KeyboardButton(text="Owner")]
-    ], resize_keyboard=True
-),
 
-
-@router.message(Command('start'))
-async def start_registration(message: types.Message, state: FSMContext, dispatcher: Dispatcher):
+@router.message(CommandStart())
+async def start_registration(message: types.Message, state: FSMContext):
+    await state.set_state(UserForm.phone_number)
     await message.answer("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni kiriting.")
-    await state.set_state("phone_number")
 
 
-@router.message(state="phone_number")
+@router.message(UserForm.phone_number)
 async def handle_phone(message: types.Message, state: FSMContext):
-    phone_number = message.text
-    await state.update_data(phone=phone_number)
-    await message.answer("Siz Studentmisiz yoki Owner?", reply_markup=choose_user_type)
-    await state.set_state("user_type")
+    await state.update_data(phone_number=message.text)
+    await message.answer(text="Siz Studentmisiz yoki Owner?", reply_markup=menu_kb())
+    await state.set_state(UserForm.user_type)
 
 
-@router.message(state="user_type")
-async def handle_user_type(message: types.Message, state: FSMContext, dispatcher: Dispatcher, bot: Bot):
+@router.message(UserForm.user_type)
+async def handle_user_type(message: types.Message, state: FSMContext):
     user_type = message.text.lower()
     user_data = await state.get_data()
-    pool = bot['db']
+    await state.clear()
+
+    pool = await create_db_pool()
     async with pool.acquire() as connection:
         await connection.execute(
-            "INSERT INTO users (phone, user_type) VALUES ($1, $2) ON CONFLICT (phone) DO NOTHING",
-            user_data["phone"], user_type
+            "INSERT INTO users (phone, name, user_id, user_type) VALUES ($1, $2,$3,$4) ON CONFLICT (phone) DO NOTHING",
+            user_data["phone_number"], message.from_user.full_name, message.from_user.id, user_type
         )
-    await message.answer("Siz muvaffaqiyatli ro'yxatdan o'tdingiz!")
-    await state.finish()
+    await pool.close()
 
+    await message.answer("Siz muvaffaqiyatli ro'yxatdan o'tdingiz!")

@@ -1,6 +1,5 @@
 from aiogram import types, Router
 from bot import dp, bot
-import executor
 from config import ADMINS
 
 from aiogram.filters import Command

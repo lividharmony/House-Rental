@@ -1,22 +1,24 @@
-from aiogram import types, Router
+import types
+
+from aiogram import Router
 from aiogram.fsm.context import FSMContext
 
-from aiogram.filters import Command, CommandStart
-from bot import dp
+from database import create_db_pool
 
 router = Router()
 
 
-@router.message(CommandStart())
-async def search_housings(message: types.Message):
+@router.message(lambda message: message.text == "Listings")
+async def search_housings(message: types.Message, state: FSMContext):
     await message.answer("Uy-joylarni qidirish uchun joylashuvni kiriting:")
-    await message.set_state("search_location")
+    await state.set_state("search_location")
 
 
 @router.message(state="search_location")
 async def handle_location(message: types.Message, state: FSMContext):
     location = message.text
-    pool = dp['db']
+    pool = await create_db_pool()
+
     async with pool.acquire() as connection:
         housings = await connection.fetch(
             "SELECT * FROM housings WHERE location = $1 AND available = TRUE", location
@@ -29,4 +31,5 @@ async def handle_location(message: types.Message, state: FSMContext):
         for housing in housings:
             response += f"{housing['description']} - {housing['price']} USD\n"
         await message.answer(response)
-    await state.finish()
+
+    await state.clear()

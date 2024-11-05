@@ -1,17 +1,21 @@
+import asyncio
+
 import asyncpg
 from config import DATABASE_URL
 
 
 async def create_db_pool():
-    return await asyncpg.create_pool(DATABASE_URL)
+    pool = await asyncpg.create_pool(DATABASE_URL)
+    return pool
+
 
 USER_TABLE = """
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     phone VARCHAR(20) NOT NULL UNIQUE,
     name VARCHAR(100),
-    user_type VARCHAR(10)  -- "student" yoki "owner"
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT,
+    user_type VARCHAR(10) CHECK (user_type IN ('student', 'owner'))
 );
 """
 
@@ -20,6 +24,7 @@ CREATE TABLE IF NOT EXISTS housings (
     id SERIAL PRIMARY KEY,
     description TEXT,
     price INTEGER,
+    photo VARCHAR(255),
     location VARCHAR(100),
     duration INTEGER,
     available BOOLEAN DEFAULT TRUE
@@ -29,9 +34,9 @@ CREATE TABLE IF NOT EXISTS housings (
 APPLICATION_TABLE = """
 CREATE TABLE IF NOT EXISTS applications (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id),
     housing_id INTEGER REFERENCES housings(id),
-    status VARCHAR(10) DEFAULT 'pending'  -- "accepted", "rejected"
+    status VARCHAR(10) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected'))
 );
 """
 
@@ -43,3 +48,5 @@ async def initialize_database(pool):
         await connection.execute(APPLICATION_TABLE)
 
 
+if __name__ == "__main__":
+    asyncio.run(create_db_pool())
