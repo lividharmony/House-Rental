@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
 from config import ADMINS
-from .admin import start_admin_housing
+from .arendator.Housing import start_admin_housing
 from .keyboards import admin_kb
 from .register import start_registration
 from .states import AdminForm

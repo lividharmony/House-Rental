@@ -1,13 +1,12 @@
-import asyncio
 import logging
 import sys
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from handlers.applications import router as applications_router
 from handlers.register import router as register_router
-from handlers.admin import router as admin_router
+from handlers.arendator.Listings import router as listing_router
+from handlers.arendator.Housing import router as housing_router
 from handlers.callbackquery import router as callback_router
-from handlers.Listings import router as listings_router
 from handlers.search import router as search_router
 
 from database import create_db_pool, initialize_database
@@ -21,9 +20,9 @@ storage = MemoryStorage()
 dp = Dispatcher(bot=bot, storage=storage)
 dp.include_routers(applications_router,
                    register_router,
-                   admin_router,
+                   listing_router,
+                   housing_router,
                    callback_router,
-                   listings_router,
                    search_router
                    )
 

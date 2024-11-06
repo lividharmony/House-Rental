@@ -26,4 +26,4 @@ async def list_all_housings(message: Message):
                 f"Duration: {housing['duration']} months"
             )
 
-    await message.answer("Here are all available listings.", reply_markup=await admin_kb(message.from_user.id))
+    await message.answer(" Barcha mavjud ro'yxatlar shu!!!", reply_markup=await admin_kb(message.from_user.id))
