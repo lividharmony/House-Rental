@@ -1,3 +1,5 @@
+import re
+
 from aiogram import types, Router, F, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart
@@ -17,9 +19,14 @@ async def start_registration(message: types.Message, state: FSMContext):
 
 @router.message(UserForm.phone_number)
 async def handle_phone(message: types.Message, state: FSMContext):
-    await state.update_data(phone_number=message.text)
-    await message.answer(text="Siz Studentmisiz yoki Owner?", reply_markup=menu_kb())
-    await state.set_state(UserForm.user_type)
+    regex = r"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"
+    if re.fullmatch(regex, message.text):
+        phone_number = message.text
+        await state.update_data({"phone_number": phone_number})
+        await message.answer(text="Siz Studentmisiz yoki Owner?", reply_markup=menu_kb())
+        await state.set_state(UserForm.user_type)
+    else:
+        await message.answer("telefon xato")
 
 
 @router.message(UserForm.user_type)
