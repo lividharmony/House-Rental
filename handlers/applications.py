@@ -1,12 +1,8 @@
 from aiogram import types, Router, Dispatcher, Bot
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
-
-from config import ADMINS
-from .arendator.Housing import start_admin_housing
 from .keyboards import admin_kb
 from .register import start_registration
-from .states import AdminForm
 
 router = Router()
 
@@ -40,4 +36,4 @@ async def apply_for_housing(message: types.Message, dispatcher: Dispatcher, stat
     #     await message.answer("Arizangizni jo'natishda xato yuz berdi.")
     #     print(f"Error inserting application: {e}")
 
-    await message.answer("Salom!", reply_markup=await admin_kb(message.from_user.id))
+    await message.answer("Salom! 👋", reply_markup=await admin_kb(message.from_user.id))

@@ -16,7 +16,7 @@ async def list_all_housings(message: Message):
         )
 
     if not housings:
-        await message.answer("No housing")
+        await message.answer("✖ Ma'lumot topilmadi")
     else:
         for housing in housings:
             await message.answer(

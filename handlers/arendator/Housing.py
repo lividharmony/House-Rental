@@ -7,7 +7,7 @@ from aiogram.types import Message
 
 from database import create_db_pool
 from config import ADMINS
-from handlers.keyboards import inline_kb, admin_kb, cancel_kb
+from handlers.keyboards import inline_kb, admin_kb, cancel_kb, location_keyboard
 from handlers.states import HousingForm
 
 router = Router()
@@ -68,16 +68,32 @@ async def add_image(message: types.Message, state: FSMContext):
     await message.bot.download_file(file_info.file_path, file_path)
     await state.update_data(photo=file_path, photo_id=photo_f.file_id)
     logging.info("Updated state with photo: %s", file_path)
-    await message.answer("Manzilni kiriting")
+    await message.answer("Manzilni kiriting", reply_markup=location_keyboard())
     await state.set_state(HousingForm.location)
+
+
+# @router.message(HousingForm.location)
+# async def add_location(message: types.Message, state: FSMContext):
+#     await state.update_data(location=message.text)
+#     logging.info("Updated state with location: %s", message.text)
+#     await message.answer("Muddatni oyda kiriting (masalan, 6):")
+#     await state.set_state(HousingForm.duration)
 
 
 @router.message(HousingForm.location)
 async def add_location(message: types.Message, state: FSMContext):
-    await state.update_data(location=message.text)
-    logging.info("Updated state with location: %s", message.text)
-    await message.answer("Muddatni oyda kiriting (masalan, 6):")
-    await state.set_state(HousingForm.duration)
+    if message.location:
+        lat = message.location.latitude
+        lon = message.location.longitude
+
+        maps_url = f"https://maps.google.com/?q={lat},{lon}"
+
+        await state.update_data(location={'latitude': lat, 'longitude': lon, 'maps_url': maps_url})
+        logging.info("Updated state with location: %s", {'latitude': lat, 'longitude': lon, 'maps_url': maps_url})
+        await message.answer("Muddatni oyda kiriting (masalan, 6):")
+        await state.set_state(HousingForm.duration)
+    else:
+        await message.answer("Iltimos, lokatsiyani yuboring.")
 
 
 @router.message(HousingForm.duration)
@@ -105,7 +121,3 @@ async def add_duration(message: types.Message, state: FSMContext):
         )
     except ValueError:
         await message.answer("Iltimos, muddatni to'g'ri formatda kiriting (faqat son).")
-
-
-
-

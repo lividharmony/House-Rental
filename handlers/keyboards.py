@@ -1,4 +1,5 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
+from markdown_it.rules_core import inline
 
 from database import create_db_pool
 
@@ -40,7 +41,7 @@ async def admin_kb(user_id):
     else:
         kb = [
             [
-                KeyboardButton(text="Search")
+                KeyboardButton(text="🔍 Search")
             ],
             [
                 KeyboardButton(text="Application")
@@ -51,15 +52,14 @@ async def admin_kb(user_id):
         keyboard=kb,
         resize_keyboard=True,
     )
-
     return keyboard
 
 
 def inline_kb():
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Accept", callback_data="accept_housing"),
-            InlineKeyboardButton(text="Reject", callback_data="reject_housing")
+            InlineKeyboardButton(text="☑ Accept", callback_data="accept_housing"),
+            InlineKeyboardButton(text="✖ Reject", callback_data="reject_housing")
         ]
     ]
     )
@@ -69,13 +69,29 @@ def inline_kb():
 def cancel_kb():
     kb = [
         [
-            KeyboardButton(text="Bekor qilish")
+            KeyboardButton(text="🔙 Bekor qilish")
         ]
     ]
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=kb,
         resize_keyboard=True,
+    )
+
+    return keyboard
+
+
+def location_keyboard():
+    kb = [
+        [
+            KeyboardButton(text="Lokatsiyani yuboring", request_location=True)
+        ]
+    ]
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        one_time_keyboard=True
     )
 
     return keyboard

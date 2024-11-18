@@ -1,3 +1,5 @@
+
+import json
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from handlers.keyboards import cancel_kb, admin_kb
@@ -10,7 +12,7 @@ from handlers.states import SearchState
 router = Router()
 
 
-@router.message(F.text == "Bekor qilish")
+@router.message(F.text == "🔙 Bekor qilish")
 async def cancel_handler(message: Message, state: FSMContext) -> None:
     await state.clear()
 
@@ -20,8 +22,7 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
     )
 
 
-
-@router.message(F.text == "Search")
+@router.message(F.text == "🔍 Search")
 async def start_search(message: Message, state: FSMContext):
     await message.answer("Qidiruv:", reply_markup=cancel_kb())
     await state.set_state(SearchState.search_query)
@@ -38,15 +39,34 @@ async def handle_search_query(message: Message, state: FSMContext):
             "WHERE location ILIKE $1 OR price::text ILIKE $1",
             f"%{search_query}%"
         )
+
     if not housings:
         await message.answer("Hech narsa topilmadi.")
     else:
         for housing in housings:
+            location = housing['location']
+            if location:
+                try:
+                    location_data = json.loads(location)
+                    latitude = location_data.get('latitude')
+                    longitude = location_data.get('longitude')
+
+                    if latitude and longitude:
+                        location_url = f"https://maps.google.com/?q={latitude},{longitude}"
+                        location_text = f"[View on Google Maps]({location_url})"
+                    else:
+                        location_text = "Bu lacatsiya malumoti tuliq emas"
+                except json.JSONDecodeError:
+                    location_text = "Bu lacatsiya malumoti yaroqsiz"
+            else:
+                location_text = "Locatsiya taqdim etilmadi."
+
             await message.answer(
                 f"Description: {housing['description']}\n"
                 f"Price: {housing['price']} UZS\n"
-                f"Location: {housing['location']}\n"
-                f"Duration: {housing['duration']} months"
+                f"Duration: {housing['duration']} months\n"
+                f"Location: {location_text}"
             )
 
     await state.clear()
+

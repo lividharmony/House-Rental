@@ -1,3 +1,4 @@
+import json
 import logging
 
 from aiogram import F, Router
@@ -20,6 +21,8 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
     photo = data.get("photo")
     location = data.get("location")
     duration = data.get("duration")
+
+    location_json = json.dumps({'latitude': location['latitude'], 'longitude': location['longitude']})
     print("description", description, "price", price, "location", location)
 
     if None in (description, price, photo, location, duration):
@@ -31,7 +34,7 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
         await connection.execute(
             "INSERT INTO housings (description, price, photo, location, duration, available)"
             " VALUES ($1, $2, $3, $4, $5, TRUE)",
-            description, price, photo, location, duration
+            description, price, photo, location_json, duration
         )
 
     await callback.message.delete()
@@ -41,9 +44,26 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
+# @router.callback_query(F.data == "reject_housing")
+# async def reject_housing(callback: CallbackQuery, state: FSMContext):
+#     await state.clear()
+#     await callback.message.edit_text("Ma'lumotlar bekor qilindi.", reply_markup=await admin_kb(callback.from_user.id))
+#     await callback.answer()
+
 @router.callback_query(F.data == "reject_housing")
 async def reject_housing(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("Ma'lumotlar bekor qilindi.", reply_markup=await admin_kb(callback.from_user.id))
+
+    if callback.message and callback.message.text:
+        await callback.message.edit_text(
+            "Ma'lumotlar bekor qilindi.",
+            reply_markup=await admin_kb(callback.from_user.id)
+        )
+    else:
+        await callback.message.answer(
+            "Ma'lumotlar bekor qilindi.",
+            reply_markup=await admin_kb(callback.from_user.id)
+        )
     await callback.answer()
+
 

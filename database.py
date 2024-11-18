@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS housings (
     description TEXT,
     price INTEGER,
     photo VARCHAR(255),
-    location VARCHAR(100),
+    location TEXT,
     duration INTEGER,
     available BOOLEAN DEFAULT TRUE
 );
