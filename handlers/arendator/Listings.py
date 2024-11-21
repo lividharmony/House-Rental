@@ -14,7 +14,7 @@ async def list_all_housings(message: Message):
         housings = await connection.fetch(
             "SELECT description, price, location, duration FROM housings WHERE available = TRUE"
         )
-
+    await pool.close()
     if not housings:
         await message.answer("✖ Ma'lumot topilmadi")
     else:

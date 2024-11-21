@@ -72,14 +72,6 @@ async def add_image(message: types.Message, state: FSMContext):
     await state.set_state(HousingForm.location)
 
 
-# @router.message(HousingForm.location)
-# async def add_location(message: types.Message, state: FSMContext):
-#     await state.update_data(location=message.text)
-#     logging.info("Updated state with location: %s", message.text)
-#     await message.answer("Muddatni oyda kiriting (masalan, 6):")
-#     await state.set_state(HousingForm.duration)
-
-
 @router.message(HousingForm.location)
 async def add_location(message: types.Message, state: FSMContext):
     if message.location:

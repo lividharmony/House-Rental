@@ -2,7 +2,7 @@
 import json
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
-from handlers.keyboards import cancel_kb, admin_kb
+from handlers.keyboards import cancel_kb, admin_kb, app_inline_kb
 
 from database import create_db_pool
 from aiogram.types import Message
@@ -35,8 +35,8 @@ async def handle_search_query(message: Message, state: FSMContext):
 
     async with pool.acquire() as connection:
         housings = await connection.fetch(
-            "SELECT description, price, location, duration FROM housings "
-            "WHERE location ILIKE $1 OR price::text ILIKE $1",
+            "SELECT id, description, price, location, duration FROM housings "
+            "WHERE description ILIKE $1 OR price::text ILIKE $1",
             f"%{search_query}%"
         )
 
@@ -44,6 +44,11 @@ async def handle_search_query(message: Message, state: FSMContext):
         await message.answer("Hech narsa topilmadi.")
     else:
         for housing in housings:
+            housing_id = housing.get('id')
+            if not housing_id:
+                await message.answer("Housing ID is missing.")
+                continue
+
             location = housing['location']
             if location:
                 try:
@@ -55,9 +60,9 @@ async def handle_search_query(message: Message, state: FSMContext):
                         location_url = f"https://maps.google.com/?q={latitude},{longitude}"
                         location_text = f"[View on Google Maps]({location_url})"
                     else:
-                        location_text = "Bu lacatsiya malumoti tuliq emas"
+                        location_text = "Bu locatsiya ma'lumoti to'liq emas"
                 except json.JSONDecodeError:
-                    location_text = "Bu lacatsiya malumoti yaroqsiz"
+                    location_text = "Bu locatsiya ma'lumoti yaroqsiz"
             else:
                 location_text = "Locatsiya taqdim etilmadi."
 
@@ -65,8 +70,8 @@ async def handle_search_query(message: Message, state: FSMContext):
                 f"Description: {housing['description']}\n"
                 f"Price: {housing['price']} UZS\n"
                 f"Duration: {housing['duration']} months\n"
-                f"Location: {location_text}"
+                f"Location: {location_text}",
+                reply_markup=app_inline_kb(housing_id)
             )
 
     await state.clear()
-

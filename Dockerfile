@@ -1,5 +1,5 @@
 # Use the official Python base image
-FROM python:3.10.7
+FROM python:3.10.7-slim
 
 # Set the working directory
 WORKDIR /app
@@ -13,3 +13,9 @@ COPY . .
 
 # Expose the port the app will run on
 EXPOSE 8000
+
+ENV PYTHONUNBUFFERED 1
+
+# Run the application
+CMD ["python", "bot.py"]
+

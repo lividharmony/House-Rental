@@ -42,10 +42,7 @@ async def admin_kb(user_id):
         kb = [
             [
                 KeyboardButton(text="🔍 Search")
-            ],
-            [
-                KeyboardButton(text="Application")
-            ],
+            ]
         ]
 
     keyboard = ReplyKeyboardMarkup(
@@ -95,3 +92,15 @@ def location_keyboard():
     )
 
     return keyboard
+
+
+def app_inline_kb(housing_id):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Application",
+                callback_data=f"application_{housing_id}"
+            )
+        ]
+    ])
+    return kb

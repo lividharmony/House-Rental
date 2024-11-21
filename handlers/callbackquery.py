@@ -32,9 +32,9 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
     pool = await create_db_pool()
     async with pool.acquire() as connection:
         await connection.execute(
-            "INSERT INTO housings (description, price, photo, location, duration, available)"
-            " VALUES ($1, $2, $3, $4, $5, TRUE)",
-            description, price, photo, location_json, duration
+            "INSERT INTO housings (description, price, photo, location, duration, available, owner_id)"
+            " VALUES ($1, $2, $3, $4, $5, TRUE, $6)",
+            description, price, photo, location_json, duration, callback.from_user.id
         )
 
     await callback.message.delete()
@@ -43,12 +43,6 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.answer()
 
-
-# @router.callback_query(F.data == "reject_housing")
-# async def reject_housing(callback: CallbackQuery, state: FSMContext):
-#     await state.clear()
-#     await callback.message.edit_text("Ma'lumotlar bekor qilindi.", reply_markup=await admin_kb(callback.from_user.id))
-#     await callback.answer()
 
 @router.callback_query(F.data == "reject_housing")
 async def reject_housing(callback: CallbackQuery, state: FSMContext):

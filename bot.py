@@ -8,7 +8,7 @@ from handlers.arendator.Listings import router as listing_router
 from handlers.arendator.Housing import router as housing_router
 from handlers.callbackquery import router as callback_router
 from handlers.search import router as search_router
-from handlers.start import router as start_help_router
+from handlers.callbackquery_ariza import router as ariza_router
 
 from database import create_db_pool, initialize_database
 import config
@@ -25,7 +25,7 @@ dp.include_routers(applications_router,
                    housing_router,
                    callback_router,
                    search_router,
-                   start_help_router
+                   ariza_router
                    )
 
 
