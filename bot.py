@@ -9,9 +9,11 @@ from handlers.arendator.Housing import router as housing_router
 from handlers.callbackquery import router as callback_router
 from handlers.search import router as search_router
 from handlers.callbackquery_ariza import router as ariza_router
+from handlers.start import router as start_router
 
 from database import create_db_pool, initialize_database
 import config
+from aiogram.types import BotCommand
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -25,7 +27,8 @@ dp.include_routers(applications_router,
                    housing_router,
                    callback_router,
                    search_router,
-                   ariza_router
+                   ariza_router,
+                   start_router
                    )
 
 

@@ -49,29 +49,7 @@ async def application_callback(callback: CallbackQuery, state: FSMContext):
             await callback.bot.send_message(
                 chat_id=owner_id,
                 text=f"♥️Yangi ariza tushdi❗\n"
-                     f"Foydalanuvchi ID: {user_id},\n Uy-joy ID: {housing_id}"
+                     f"👨🏻 Foydalanuvchi ID: {user_id},\n 🏠 Uy-joy ID: {housing_id}"
                 )
     await state.clear()
-    await callback.answer("Arizangiz qabul qilindi!")
-
-# owner = await connection.fetchrow(
-#     "SELECT u.user_id FROM housings h "
-#     "JOIN users u ON h.owner_id = u.id WHERE h.id = $1",
-#     housing_id
-# )
-# if owner and owner['user_id']:
-#     try:
-#         owner_id = int(owner['user_id'])
-#         await callback.bot.send_chat_action(chat_id=owner_id, action="typing")
-#
-#         await callback.bot.send_message(
-#             chat_id=owner_id,
-#             text=f"Yangi ariza tushdi!\n"
-#                  f"Foydalanuvchi ID: {user_id}, Uy-joy ID: {housing_id}"
-#         )
-#     except Exception as e:
-#         logging.error(f"Error {owner_id}: {e}")
-#         await callback.answer("Egasiga xabar yuborishda xatolik yuz berdi.")
-# else:
-#     logging.error(f"owner topilmadi: {housing_id}")
-#     await callback.answer("Uy egasi topilmadi.")
+    await callback.answer("🤝 Arizangiz qabul qilindi!")
