@@ -32,10 +32,10 @@ async def admin_kb(user_id):
     if user_type == 'owner':
         kb = [
             [
-                KeyboardButton(text="Listings")
+                KeyboardButton(text="📂 Listings")
             ],
             [
-                KeyboardButton(text="Housing")
+                KeyboardButton(text="📃 Housing")
             ],
         ]
     else:

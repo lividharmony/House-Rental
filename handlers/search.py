@@ -24,7 +24,7 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
 
 @router.message(F.text == "🔍 Search")
 async def start_search(message: Message, state: FSMContext):
-    await message.answer("Qidiruv:", reply_markup=cancel_kb())
+    await message.answer("Qidiruv 🖋:", reply_markup=cancel_kb())
     await state.set_state(SearchState.search_query)
 
 
@@ -41,7 +41,7 @@ async def handle_search_query(message: Message, state: FSMContext):
         )
 
     if not housings:
-        await message.answer("Hech narsa topilmadi.")
+        await message.answer("❌ Hech narsa topilmadi.")
     else:
         for housing in housings:
             housing_id = housing.get('id')
@@ -62,16 +62,15 @@ async def handle_search_query(message: Message, state: FSMContext):
                     else:
                         location_text = "Bu locatsiya ma'lumoti to'liq emas"
                 except json.JSONDecodeError:
-                    location_text = "Bu locatsiya ma'lumoti yaroqsiz"
+                    location_text = "⚠️Bu locatsiya ma'lumoti yaroqsiz"
             else:
-                location_text = "Locatsiya taqdim etilmadi."
+                location_text = "⚠️Locatsiya taqdim etilmadi."
 
             await message.answer(
-                f"Description: {housing['description']}\n"
-                f"Price: {housing['price']} UZS\n"
-                f"Duration: {housing['duration']} months\n"
-                f"Location: {location_text}",
+                f"Description🟰 {housing['description']}\n"
+                f"Price🟰 {housing['price']} UZS\n"
+                f"Duration🟰 {housing['duration']} months\n"
+                f"Location🟰 {location_text}",
                 reply_markup=app_inline_kb(housing_id)
             )
-
     await state.clear()

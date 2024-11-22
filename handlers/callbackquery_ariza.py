@@ -12,7 +12,7 @@ router = Router()
 async def application_callback(callback: CallbackQuery, state: FSMContext):
     housing_id = callback.data.split("_")[1]
     if not housing_id.isdigit():
-        await callback.answer("Noto'g'ri uy-joy ID!")
+        await callback.answer("⚠️Noto'g'ri uy-joy ID!")
         return
 
     housing_id = int(housing_id)
@@ -35,7 +35,7 @@ async def application_callback(callback: CallbackQuery, state: FSMContext):
             )
         except Exception as e:
             logging.error(f"Error inserting application: {e}")
-            await callback.answer("Arizangizni saqlashda xatolik yuz berdi.")
+            await callback.answer("⚠️Arizangizni saqlashda xatolik yuz berdi.")
             return
         owner = await connection.fetchrow(
             "SELECT u.user_id FROM housings h JOIN users u ON h.owner_id = u.user_id WHERE h.id = $1",
@@ -48,10 +48,10 @@ async def application_callback(callback: CallbackQuery, state: FSMContext):
             logging.error(f"{owner_id}")
             await callback.bot.send_message(
                 chat_id=owner_id,
-                text=f"Yangi ariza tushdi!\n"
+                text=f"♥️Yangi ariza tushdi❗\n"
                      f"Foydalanuvchi ID: {user_id},\n Uy-joy ID: {housing_id}"
                 )
-
+    await state.clear()
     await callback.answer("Arizangiz qabul qilindi!")
 
 # owner = await connection.fetchrow(

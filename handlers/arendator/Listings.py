@@ -6,7 +6,7 @@ from handlers.keyboards import admin_kb
 router = Router()
 
 
-@router.message(F.text == "Listings")
+@router.message(F.text == "📂 Listings")
 async def list_all_housings(message: Message):
     pool = await create_db_pool()
 
@@ -20,10 +20,10 @@ async def list_all_housings(message: Message):
     else:
         for housing in housings:
             await message.answer(
-                f"Description: {housing['description']}\n"
-                f"Price: {housing['price']} UZS\n"
-                f"Location: {housing['location']}\n"
-                f"Duration: {housing['duration']} months"
+                f"Description🟰 {housing['description']}\n"
+                f"Price🟰 {housing['price']} UZS\n"
+                f"Location🟰 {housing['location']}\n"
+                f"Duration🟰 {housing['duration']} months"
             )
 
-    await message.answer(" Barcha mavjud ro'yxatlar shu!!!", reply_markup=await admin_kb(message.from_user.id))
+    await message.answer("📌 Barcha mavjud ro'yxatlar shu ‼", reply_markup=await admin_kb(message.from_user.id))

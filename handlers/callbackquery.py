@@ -38,7 +38,7 @@ async def confirm_housing(callback: CallbackQuery, state: FSMContext):
         )
 
     await callback.message.delete()
-    await callback.message.answer("Uy-joy muvaffaqiyatli qo'shildi!",
+    await callback.message.answer("✔ Uy-joy muvaffaqiyatli qo'shildi!",
                                   reply_markup=await admin_kb(callback.from_user.id))
     await state.clear()
     await callback.answer()
@@ -50,12 +50,12 @@ async def reject_housing(callback: CallbackQuery, state: FSMContext):
 
     if callback.message and callback.message.text:
         await callback.message.edit_text(
-            "Ma'lumotlar bekor qilindi.",
+            "❌ Ma'lumotlar bekor qilindi.",
             reply_markup=await admin_kb(callback.from_user.id)
         )
     else:
         await callback.message.answer(
-            "Ma'lumotlar bekor qilindi.",
+            "❌ Ma'lumotlar bekor qilindi.",
             reply_markup=await admin_kb(callback.from_user.id)
         )
     await callback.answer()

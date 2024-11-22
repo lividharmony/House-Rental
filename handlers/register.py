@@ -14,7 +14,7 @@ router = Router()
 @router.message(CommandStart())
 async def start_registration(message: types.Message, state: FSMContext):
     await state.set_state(UserForm.phone_number)
-    await message.answer("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni kiriting.")
+    await message.answer("Xush kelibsiz❗ Ro'yxatdan o'tish uchun telefon raqamingizni kiriting.")
 
 
 @router.message(UserForm.phone_number)
@@ -23,10 +23,10 @@ async def handle_phone(message: types.Message, state: FSMContext):
     if re.fullmatch(regex, message.text):
         phone_number = message.text
         await state.update_data({"phone_number": phone_number})
-        await message.answer(text="Siz Studentmisiz yoki Owner?", reply_markup=menu_kb())
+        await message.answer(text="Siz Studentmisiz yoki Owner❓", reply_markup=menu_kb())
         await state.set_state(UserForm.user_type)
     else:
-        await message.answer("telefon xato")
+        await message.answer("❌ telefon xato")
 
 
 @router.message(UserForm.user_type)
@@ -43,4 +43,4 @@ async def handle_user_type(message: types.Message, state: FSMContext):
         )
     await pool.close()
 
-    await message.answer("Siz muvaffaqiyatli ro'yxatdan o'tdingiz!")
+    await message.answer("✔️Siz muvaffaqiyatli ro'yxatdan o'tdingiz!")

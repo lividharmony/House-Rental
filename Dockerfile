@@ -4,7 +4,6 @@ FROM python:3.10.7-slim
 # Set the working directory
 WORKDIR /app
 
-# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,5 +16,5 @@ EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
 # Run the application
-CMD ["python", "bot.py"]
+CMD ["python", "bot.py", "runserver", "0.0.0.0:8000"]
 
