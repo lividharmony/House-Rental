@@ -68,7 +68,7 @@ async def handle_search_query(message: Message, state: FSMContext):
 
             await message.answer(
                 f"Description🟰 {housing['description']}\n"
-                f"Price🟰 {housing['price']} UZS\n"
+                f"Price🟰 {housing['price']} USD\n"
                 f"Duration🟰 {housing['duration']} months\n"
                 f"Location🟰 {location_text}",
                 reply_markup=app_inline_kb(housing_id)

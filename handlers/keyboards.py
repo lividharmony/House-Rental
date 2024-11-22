@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from markdown_it.rules_core import inline
 
@@ -104,3 +106,25 @@ def app_inline_kb(housing_id):
         ]
     ])
     return kb
+
+
+# KALENDAR BUTTON
+def generate_calendar():
+    today = datetime.date.today()
+    current_month = today.month
+    current_year = today.year
+    days_in_month = [datetime.date(current_year, current_month, day) for day in range(1, 32)
+                     if datetime.date(current_year, current_month, day).month == current_month]
+
+    buttons = []
+    row = []
+    for i, day in enumerate(days_in_month, start=1):
+        button = KeyboardButton(day.day)
+        row.append(button)
+
+        if i % 7 == 0 or i == len(days_in_month):  # Start a new row after every 7 days (week)
+            buttons.append(row)
+            row = []
+
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+

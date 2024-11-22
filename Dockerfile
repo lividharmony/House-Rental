@@ -13,8 +13,4 @@ COPY . .
 # Expose the port the app will run on
 EXPOSE 8000
 
-ENV PYTHONUNBUFFERED 1
-
-# Run the application
-CMD ["python", "bot.py", "runserver", "0.0.0.0:8000"]
 

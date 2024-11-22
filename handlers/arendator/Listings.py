@@ -9,7 +9,7 @@ router = Router()
 @router.message(F.text == "📂 Listings")
 async def list_all_housings(message: Message):
     pool = await create_db_pool()
-
+    user_id = message.from_user.id
     async with pool.acquire() as connection:
         housings = await connection.fetch(
             "SELECT description, price, location, duration FROM housings WHERE available = TRUE"

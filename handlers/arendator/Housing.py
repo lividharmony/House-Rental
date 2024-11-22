@@ -7,7 +7,7 @@ from aiogram.types import Message
 
 from database import create_db_pool
 from config import ADMINS
-from handlers.keyboards import inline_kb, admin_kb, cancel_kb, location_keyboard
+from handlers.keyboards import inline_kb, admin_kb, cancel_kb, location_keyboard, generate_calendar
 from handlers.states import HousingForm
 
 router = Router()
