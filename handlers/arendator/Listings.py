@@ -21,7 +21,7 @@ async def list_all_housings(message: Message):
         for housing in housings:
             await message.answer(
                 f"Description🟰 {housing['description']}\n"
-                f"Price🟰 {housing['price']} UZS\n"
+                f"Price🟰 {housing['price']} USD\n"
                 f"Location🟰 {housing['location']}\n"
                 f"Duration🟰 {housing['duration']} months"
             )
